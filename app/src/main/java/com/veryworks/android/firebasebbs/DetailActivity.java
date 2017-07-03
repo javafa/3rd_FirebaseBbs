@@ -39,7 +39,10 @@ public class DetailActivity extends AppCompatActivity {
         // 2. 입력할 데이터의 키 생성
         String bbsKey = bbsRef.push().getKey(); // 자동생성된 키를 가져온다
         // 3. 생성된 키를 레퍼런스로 데이터를 입력
+        //    insert 와 update, delete 는 동일하게 동작
         bbsRef.child(bbsKey).setValue(bbs);
+        //    update : bbsRef.child(bbsKey).setValue(bbs);
+        //    delete : bbsRef.child(bbsKey).setValue(null);
         // 데이터 입력후 창 닫기
         finish();
     }
