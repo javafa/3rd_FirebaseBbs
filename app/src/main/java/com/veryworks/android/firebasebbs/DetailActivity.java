@@ -1,6 +1,8 @@
 package com.veryworks.android.firebasebbs;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -49,6 +51,20 @@ public class DetailActivity extends AppCompatActivity {
         textImage = (TextView) findViewById(R.id.textImage);
     }
 
+
+
+    // 데이터 전송
+    public void postData(View view){
+        String imagePath = textImage.getText().toString();
+        // 이미지가 있으면 이미지 경로를 받아서 저장해야 되기 때문에
+        // 이미지를 먼저 업로드 한다.
+        if(imagePath != null && !"".equals(imagePath)){
+            uploadFile(imagePath);
+        }else{
+            afterUploadFile(null);
+        }
+    }
+
     public void uploadFile(String filePath){
         // 스마트폰에 있는 파일의 경로
         File file = new File(filePath);
@@ -58,13 +74,16 @@ public class DetailActivity extends AppCompatActivity {
         // 데이터베이스의 키 = 값과 동일한 구조
         StorageReference fileRef = mStorageRef.child(fileName);
 
+        Log.i("FBStorage","Upload check ========= 1");
+
         fileRef.putFile(uri)
             .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    // Get a URL to the uploaded content
-                    // Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                    Log.i("FBStorage","Upload Success!");
+                    // 파이어베이스 스토리지에 방금 업로드한 파일의 경로
+                    @SuppressWarnings("VisibleForTests")
+                    Uri uploadedUri = taskSnapshot.getDownloadUrl();
+                    afterUploadFile(uploadedUri);
                 }
             })
             .addOnFailureListener(new OnFailureListener() {
@@ -74,17 +93,24 @@ public class DetailActivity extends AppCompatActivity {
                     Log.e("FBStorage","Upload Fail:"+exception.getMessage());
                 }
             });
+        Log.i("FBStorage","Upload check ========= 2");
     }
 
-    // 데이터 전송
-    public void postData(View view){
+    public void afterUploadFile(Uri imageUri){
         String title = editTitle.getText().toString();
         String author = editAuthor.getText().toString();
         String content = editContent.getText().toString();
 
+        Log.i("FBStorage","Upload check ========= 3");
+
         // 파이어베이스 데이터베이스에 데이터 넣기
         // 1. 데이터 객체 생성
         Bbs bbs = new Bbs(title, author, content);
+
+        if(imageUri != null){
+            bbs.fileUriString = imageUri.toString();
+        }
+
         // 2. 입력할 데이터의 키 생성
         String bbsKey = bbsRef.push().getKey(); // 자동생성된 키를 가져온다
         // 3. 생성된 키를 레퍼런스로 데이터를 입력
@@ -111,9 +137,21 @@ public class DetailActivity extends AppCompatActivity {
                 // 나. 이미지 선택창에서 선택된 이미지의 경로 추출
                 case 100:
                     Uri imageUri = data.getData();
-                    textImage.setText(imageUri.getPath());
+                    String filePath = getPathFromUri(this, imageUri);
+                    textImage.setText(filePath);
                     break;
             }
         }
+    }
+
+    // Uri 에서 실제 경로 꺼내는 함수
+    public static String getPathFromUri(Context context, Uri uri){
+        String realPath = "";
+        Cursor cursor = context.getContentResolver().query(uri,null,null,null,null);
+        if(cursor.moveToNext()){
+            realPath = cursor.getString(cursor.getColumnIndex("_data"));
+        }
+        cursor.close();
+        return realPath;
     }
 }
