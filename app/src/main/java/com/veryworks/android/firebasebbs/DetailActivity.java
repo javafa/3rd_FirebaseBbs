@@ -1,5 +1,6 @@
 package com.veryworks.android.firebasebbs;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -33,6 +34,9 @@ public class DetailActivity extends AppCompatActivity {
     // 스토리지
     private StorageReference mStorageRef;
 
+    // 프로그래스 다이얼로그
+    private ProgressDialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,16 +49,22 @@ public class DetailActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_detail);
 
+        // 다이얼로그
+        dialog = new ProgressDialog(this);
+        dialog.setTitle("Upload Data");
+        dialog.setMessage("uploading...");
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
+        // 위젯
         editTitle = (EditText) findViewById(R.id.editTitle);
         editAuthor = (EditText) findViewById(R.id.editAuthor);
         editContent = (EditText) findViewById(R.id.editContent);
         textImage = (TextView) findViewById(R.id.textImage);
     }
 
-
-
     // 데이터 전송
     public void postData(View view){
+        dialog.show();
         String imagePath = textImage.getText().toString();
         // 이미지가 있으면 이미지 경로를 받아서 저장해야 되기 때문에
         // 이미지를 먼저 업로드 한다.
@@ -119,6 +129,7 @@ public class DetailActivity extends AppCompatActivity {
         //    update : bbsRef.child(bbsKey).setValue(bbs);
         //    delete : bbsRef.child(bbsKey).setValue(null);
         // 데이터 입력후 창 닫기
+        dialog.dismiss();
         finish();
     }
 
