@@ -25,7 +25,7 @@ import com.veryworks.android.firebasebbs.domain.Bbs;
 
 import java.io.File;
 
-public class DetailActivity extends AppCompatActivity {
+public class WriteActivity extends AppCompatActivity {
     EditText editTitle, editAuthor, editContent;
     TextView textImage;
     // 데이터베이스

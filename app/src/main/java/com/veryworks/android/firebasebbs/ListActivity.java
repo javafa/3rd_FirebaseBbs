@@ -15,7 +15,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.veryworks.android.firebasebbs.domain.Bbs;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ListActivity extends AppCompatActivity {
@@ -24,6 +23,8 @@ public class ListActivity extends AppCompatActivity {
 
     FirebaseDatabase database;
     DatabaseReference bbsRef;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +45,18 @@ public class ListActivity extends AppCompatActivity {
         bbsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot data) {
-                List<Bbs> list = new ArrayList<Bbs>();
+                Data.list.clear();
                 for(DataSnapshot item : data.getChildren()){
                     // json 데이터를 Bbs 인스턴스로 변환오류 발생 가능성 있음
                     // 그래서 예외처리 필요
                     try {
                         Bbs bbs = item.getValue(Bbs.class);
-                        list.add(bbs);
+                        Data.list.add(bbs);
                     }catch(Exception e){
                         Log.e("Firebase",e.getMessage());
                     }
                 }
-                refreshList(list);
+                refreshList(Data.list);
             }
 
             @Override
@@ -72,7 +73,7 @@ public class ListActivity extends AppCompatActivity {
 
     // 데이터 전송처리
     public void postData(View view){
-        Intent intent = new Intent(this, DetailActivity.class);
+        Intent intent = new Intent(this, WriteActivity.class);
         startActivity(intent);
     }
 }

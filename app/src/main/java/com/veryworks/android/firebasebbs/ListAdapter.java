@@ -1,6 +1,7 @@
 package com.veryworks.android.firebasebbs;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,15 +45,29 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.Holder>{
         Bbs bbs = data.get(position);
         holder.setTitle(bbs.title);
         holder.setCount(bbs.count);
+        holder.setPosition(position);
     }
 
     class Holder extends RecyclerView.ViewHolder {
+        private int position;
         private TextView textTitle;
         private TextView textCount;
         public Holder(View v) {
             super(v);
             textTitle = (TextView) v.findViewById(R.id.textTitle);
             textCount = (TextView) v.findViewById(R.id.textCount);
+
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), ReadActivity.class);
+                    intent.putExtra("LIST_POSITION", position);
+                    v.getContext().startActivity(intent);
+                }
+            });
+        }
+        public void setPosition(int position){
+            this.position = position;
         }
         public void setTitle(String title){
             textTitle.setText(title);
