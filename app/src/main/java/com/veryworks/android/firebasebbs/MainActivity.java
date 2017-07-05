@@ -1,5 +1,6 @@
 package com.veryworks.android.firebasebbs;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -111,8 +112,16 @@ public class MainActivity extends AppCompatActivity implements PermissionControl
                         Toast.makeText(MainActivity.this,
                                 "Sign-in 되었습니다",
                                 Toast.LENGTH_SHORT).show();
+                        goMain();
                     }
                 }
             });
+    }
+
+    public void goMain(){
+        Intent intent = new Intent(this, NaviActivity.class);
+        startActivity(intent);
+
+        finish();
     }
 }
